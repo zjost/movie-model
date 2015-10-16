@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# python /Users/ikt306/Documents/training/metis/capitalone-pilotthree/project_1/movie_analysis.py
+
 import os
 import json
 from pprint import pprint
@@ -52,13 +55,14 @@ if __name__ == '__main__':
     DATA_DIR = os.path.join('/Users/ikt306/Documents/training/metis/capitalone-pilotthree/project_1/data', 'boxofficemojo')
     movie_list1 = file_load(DATA_DIR)
     movies_df1 = pd.DataFrame(movie_list1)
+    movies_df1['title'] = movies_df1['title'].apply(lambda x: x.strip())
 
     DATA_DIR = os.path.join('/Users/ikt306/Documents/training/metis/capitalone-pilotthree/project_1/data', 'metacritic')
     movie_list2 = file_load(DATA_DIR)
     movies_df2 = pd.DataFrame(movie_list2)
+    movies_df2['title'] = movies_df2['title'].apply(lambda x: x.strip() if type(x) == str else x)
 
     left_col = [
-     u'director',
      u'domestic_gross',
      u'mojo_slug',
      u'production_budget',
@@ -67,14 +71,14 @@ if __name__ == '__main__':
      u'worldwide_gross',
      u'year']
     right_col = [
+    u'director',
      u'genre',
      u'runtime_minutes',
      u'studio',
      u'title',
      u'rating']
 
-    movies_df = pd.merge(movies_df1[left_col], movies_df2[right_col], on='title', how='left')
-
+    movies_df = pd.merge(movies_df1[left_col], movies_df2[right_col], on='title', how='inner')
     # title feature
     movies_df['title_word_count'] = movies_df['title'].apply(lambda x: len(x.split()))
 
@@ -95,5 +99,6 @@ if __name__ == '__main__':
     movies_df = top_dummy_create(movies_df, 'month', 13)
 
     # Genre
-    movies_df['genre'] = movies_df['genre'].apply(lambda x: ' '.join(x) if type(x) == list else x)
+    movies_df['genre_trans'] = movies_df['genre'].apply(lambda x: ' '.join(x) if type(x) == list else x)
     movies_df = flag_genre(movies_df)
+    
